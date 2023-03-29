@@ -6,6 +6,7 @@ use App\Http\Controllers\CampusExtension;
 use App\Http\Controllers\ChancellorController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CampusRecordsController;
 
 
 Route::get('/', function () {
@@ -45,9 +46,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/document/view/{document_id}', [DocumentController::class, 'view'])->name('document.view');
         Route::get('/document/edit/{document_id}', [DocumentController::class, 'edit'])->name('document.edit');
     });
-    
 
-    Route::middleware(['role:campus_extensions'])->group(function () {
+    Route::middleware(['role:campus_records'])->group(function () {
+        Route::get('/campus_records/dashboard', [CampusRecordsController::class, 'dashboard'])->name('campus_records.dashboard');
+        Route::get('/campus_records/incoming', [CampusRecordsController::class, 'incomingDocuments'])->name('campus_records.incoming');
+        Route::get('/campus_records/download/{file}', [CampusRecordsController::class, 'downloadFile'])->name('download.file');
+        Route::post('/campus_records/forward/{id}', [CampusRecordsController::class, 'forwardDocument'])->name('campus_records.forward');
+        Route::get('/campus_records/outgoing', [CampusRecordsController::class, 'outgoingDocuments'])->name('campus_records.outgoing');
+
+        Route::get('/campus_records/document_history', [CampusRecordsController::class, 'documentHistory'])->name('document_history');
+        Route::get('/campus_records/document_history/data', [CampusRecordsController::class, 'documentHistoryData'])->name('document_history.data');
+
+        // Add more routes for campus_extensions role as needed
+    });
+     Route::middleware(['role:campus_extensions'])->group(function () {
         Route::get('/campus-extensions/dashboard', [CampusExtension::class, 'dashboard'])->name('campus_extension.dashboard');
         // Add more routes for campus_extensions role as needed
     });

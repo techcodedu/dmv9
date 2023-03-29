@@ -25,4 +25,6 @@ class Office extends Model
     {
         return $this->hasMany(Routing::class, 'forwarded_to');
     }
+
+
 }

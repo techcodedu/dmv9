@@ -6,12 +6,13 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
+use Illuminate\Notifications\Notifiable;
 use App\Models\Office;
 use App\Models\Department;
 
 class User extends Model implements Authenticatable
 {
-    use HasFactory, AuthenticableTrait;
+    use HasFactory, AuthenticableTrait,Notifiable;
 
     protected $table = 'users';
 

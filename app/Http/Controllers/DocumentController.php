@@ -19,7 +19,6 @@ class DocumentController extends Controller
     {
         // Get the document with the specified ID
         $document = Document::find($document_id);
-
         // Get the list of departments
         $departments = Department::all();
 

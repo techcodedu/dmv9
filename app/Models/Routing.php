@@ -13,6 +13,7 @@ class Routing extends Model
     use HasFactory;
 
     protected $table = 'routing';
+    protected $primaryKey = 'routing_id';
 
     const STATUS_DRAFT = 'draft';
     const STATUS_FORWARDED = 'forwarded';
@@ -81,5 +82,6 @@ class Routing extends Model
     {
         return $this->hasOne(Document::class, 'document_id')->orderByDesc('created_at');
     }
+  
 
 }

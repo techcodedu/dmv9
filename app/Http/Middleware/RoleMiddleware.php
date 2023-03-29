@@ -35,6 +35,9 @@ class RoleMiddleware
             case 'college':
                 return 'college.dashboard';
                 break;
+            case 'campus_records':
+                return 'campus_records.dashboard';
+                break;
             case 'campus_extensions':
                 return 'campus_extension.dashboard';
                 break;

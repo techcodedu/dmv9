@@ -52,7 +52,6 @@ class Document extends Model
         return $this->hasMany(File::class, 'document_id');
     }
 
-
     public function routing()
     {
         return $this->hasMany(Routing::class);

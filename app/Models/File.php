@@ -9,6 +9,7 @@ use App\Models\Document;
 class File extends Model
 {
     use HasFactory;
+    protected $primaryKey = 'file_id';
 
     protected $fillable = [
         'document_id',

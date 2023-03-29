@@ -63,4 +63,8 @@ td.d-flex.justify-content-between.align-items-center .flex-wrap {
         background-color: lightgreen;
         cursor: pointer;
 }
+.content-wrapper {
+    padding: 25px;
+}
+
 

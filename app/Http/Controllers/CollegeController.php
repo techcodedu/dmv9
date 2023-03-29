@@ -9,9 +9,12 @@ use App\Models\Office;
 use App\Models\Routing;
 use App\Models\Document;
 use App\Models\Department;
+use App\Models\DocumentHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\IncomingDocumentNotification;
+
 
 
 
@@ -82,8 +85,8 @@ class CollegeController extends Controller
             // Generate a unique filename for the file
             $uniqueFilename = $filename . '_' . time() . '.' . $extension;
 
-            // Move the file to the storage directory
-            $file->storeAs('documents', $uniqueFilename, 'public');
+            // Move the file to the public/documents directory
+            $file->move(public_path('documents'), $uniqueFilename);
 
             // Create a new Document instance with the validated data
             $document = new Document([
@@ -95,8 +98,7 @@ class CollegeController extends Controller
                 'date_modified' => now(),
                 'department_id' => Auth::user()->department_id
             ]);
-           
-
+   
             // Save the document to the database
             $document->save();
 
@@ -110,7 +112,6 @@ class CollegeController extends Controller
                 'date_forwarded' => now(),
             ]);
             
-
             // Validate the routing data
             $validator = Validator::make($routing->toArray(), [
                 'document_id' => 'required|exists:documents,document_id',
@@ -127,10 +128,20 @@ class CollegeController extends Controller
             // Set the document_id attribute of the Routing instance
             $routing->document_id = $document->document_id;
 
-            
             // Save the routing to the database
             $routing->save();
 
+            // Create a new DocumentHistory instance
+            $documentHistory = new DocumentHistory([
+                'document_id' => $document->document_id,
+                'from_role' => Auth::user()->role, // Get the role of the authenticated user
+                'to_role' => User::where('office_id', $request->input('office_id'))->first()->role, // Get the role of the user in the destination office
+                'status' => $request->input('status'),
+                'user_id' => Auth::user()->id,
+            ]);
+
+            // Save the document history to the database
+            $documentHistory->save();
 
             // Create a new File instance
             $fileModel = new File([
@@ -138,7 +149,7 @@ class CollegeController extends Controller
                 'filename' => $uniqueFilename,
                 'file_path' => 'public/documents/' . $uniqueFilename,
                 'file_type' => $extension,
-                'file_size' => $file->getSize(),
+                'file_size' => filesize(public_path('documents/' . $uniqueFilename)), // Get the file size after moving it
                 'hash' => $hash,
             ]);
 
@@ -146,77 +157,76 @@ class CollegeController extends Controller
             // Save the file to the database
             $fileModel->save();
 
+            
+            // Send the notification to the users of the destination office
+            // $users = User::where('office_id', $routing->to_office_id)->get();
+            // foreach ($users as $user) {
+            //     $user->notify(new IncomingDocumentNotification($routing));
+            // }
+
             // Redirect back to the create document page with a success message
             return redirect()->route('college.show_create_document')->with('success', 'Document created successfully.');
         }
     }
 
-    public function documentHistory()
-    {
-        // Get the current authenticated user
-        $user = Auth::user();
-    
-        //get all document uploader by specific user
-        $documents = Document::with(['latestRouting', 'department', 'files'])
-            ->join('departments', 'documents.department_id', '=', 'departments.id')
-            ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
-            ->where('current_owner_id', $user->id)
-            ->orderBy('date_forwarded', 'desc')
-            ->paginate(5);
+        public function documentHistory()
+        {
+            // Get the current authenticated user
+            $user = Auth::user();
+        
+            //get all document uploader by specific user
+            $documents = Document::with(['latestRouting', 'department', 'files'])
+                ->join('departments', 'documents.department_id', '=', 'departments.id')
+                ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
+                ->where('current_owner_id', $user->id)
+                ->orderBy('date_forwarded', 'desc')
+                ->paginate(5);
 
-        //Get all the documents uploaded by the current user as per deparment
-        // $documents = $documents = Document::with(['latestRouting', 'department', 'files'])
-        //           ->join('departments', 'documents.department_id', '=', 'departments.id')
-        //           ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
-        //           ->where('department_id', $user->department_id)
-        //           ->orderBy('date_forwarded', 'desc')
-        //           ->paginate(5);
+            //Get all the documents uploaded by the current user as per deparment
+            // $documents = $documents = Document::with(['latestRouting', 'department', 'files'])
+            //           ->join('departments', 'documents.department_id', '=', 'departments.id')
+            //           ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
+            //           ->where('department_id', $user->department_id)
+            //           ->orderBy('date_forwarded', 'desc')
+            //           ->paginate(5);
 
-        //   gets all the documents regardless on deparment_id
-        // $documents = Document::with(['latestRouting', 'department', 'files'])
-        // ->join('departments', 'documents.department_id', '=', 'departments.id')
-        // ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
-        // ->orderBy('date_forwarded', 'desc')
-        // ->paginate(2);
+            //   gets all the documents regardless on deparment_id
+            // $documents = Document::with(['latestRouting', 'department', 'files'])
+            // ->join('departments', 'documents.department_id', '=', 'departments.id')
+            // ->select('documents.*', 'departments.name AS department_name', 'documents.document_id AS document_id')
+            // ->orderBy('date_forwarded', 'desc')
+            // ->paginate(2);
 
+            // Loop through each document and add additional information
+            foreach ($documents as $document) {
+                // Get the to office name and status of the latest routing
+                $latestRouting = $document->latestRouting;
+                if ($latestRouting) {
+                    $toOffice = Office::find($latestRouting->to_office_id);
+                    $document->to_office_name = $toOffice->name;
+                    $document->status = $latestRouting->status;
+                } else {
+                    $document->to_office_name = '-';
+                    $document->status = '-';
+                }
+        
+                // Get the file details
+                $file = $document->files->first();
+                if ($file) {
+                    $document->filename = $file->filename;
+                } else {
+                    $document->filename = '-';
+                }
+                // Format the date_forwarded field
+                $dateForwarded = $latestRouting ? date('F j, Y \a\t g:i A', strtotime($latestRouting->date_forwarded)) : '-';
+                $document->date_forwarded = $dateForwarded;
 
-
-    
-    
-        // Loop through each document and add additional information
-        foreach ($documents as $document) {
-            // Get the to office name and status of the latest routing
-            $latestRouting = $document->latestRouting;
-            if ($latestRouting) {
-                $toOffice = Office::find($latestRouting->to_office_id);
-                $document->to_office_name = $toOffice->name;
-                $document->status = $latestRouting->status;
-            } else {
-                $document->to_office_name = '-';
-                $document->status = '-';
             }
-    
-            // Get the file details
-            $file = $document->files->first();
-            if ($file) {
-                $document->filename = $file->filename;
-            } else {
-                $document->filename = '-';
-            }
-            // Format the date_forwarded field
-            $dateForwarded = $latestRouting ? date('F j, Y \a\t g:i A', strtotime($latestRouting->date_forwarded)) : '-';
-            $document->date_forwarded = $dateForwarded;
-
+        
+            // Return the view with the documents data
+            return view('college.document_history', ['documents' => $documents]);
         }
     
-        // Return the view with the documents data
-        return view('college.document_history', ['documents' => $documents]);
-    }
-    
-
-
-
-
     // public function profile()
     // {
     //     $user = Auth::user();

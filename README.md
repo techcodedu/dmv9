@@ -1,64 +1,32 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+Sprint 2
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. College, (modify, view document forwarded, track route )
+   -in the modify the college only can replace the file or cancel the forwarding
+   -once cancel a field name "active"(true or false) in document and routing table
+2. Campus Extension Login
+    - campus extension view of the file forwarded by college
+    - campus extension modify the routing of the file 
 
-## About Laravel
+3. Edit profile for college/ campus extension
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+--------------------------
+Additonal Featuers on the Outgoing and Incoming Documents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Move to Outgoing Documents: You can add a button or link to each row in the Incoming Documents table that will trigger moving the document to the Outgoing Documents list. You'll need to create a new route and controller method to handle this action, update the document status, and then refresh the page or use AJAX to update the list.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Add Notes: You can add a feature to allow users to add notes to each document. This can be useful for keeping track of any required actions, comments, or other information related to the document. You can create a new table in your database to store the notes, and display them in a modal or dedicated view.
 
-## Learning Laravel
+Forward to another department: You can add a feature to forward the document to another department, with a dropdown list of available departments. This would require creating a new route and controller method, updating the forwarding department information in the database, and refreshing the page or using AJAX to update the list.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Search and Filter: Implement search functionality to allow users to search documents based on specific criteria like document ID, document type, forwarding department, etc. Additionally, you
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+Additionally, you can implement filters to let users narrow down the list of incoming documents based on certain criteria like date range, document type, or department. This can help users find specific documents more efficiently.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Mark as complete: You can add an option for users to mark incoming documents as complete or processed. This would involve adding a new status to your document statuses (e.g., 'Processed') and creating a new route and controller method to update the document status in the database.
 
-### Premium Partners
+Document categorization: Allow users to categorize or tag documents based on their content, purpose, or other criteria. This can help users manage, search, and filter documents more effectively. You would need to create a new table in your database to store the categories or tags and update the document model to have a relationship with the new category or tag model.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Export to CSV or PDF: Implement a feature that allows users to export the list of incoming documents to a CSV or PDF file, which can be useful for reporting and analysis purposes. There are packages available for Laravel that can help with generating CSV and PDF files.
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Batch actions: Allow users to perform actions on multiple documents at once, such as moving multiple documents to Outgoing Documents or forwarding multiple documents to a specific department. This would require creating new routes and controller methods to handle batch actions, and implementing checkboxes or another method for selecting multiple documents in the user interface.
